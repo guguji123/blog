@@ -9,6 +9,9 @@ verify_ssl = true
 flask = "*"
 python-dotenv = "*"
 flask-cors = "*"
+flask-sqlalchemy = "*"
+flask-migrate = "*"
+flask-httpauth = "*"
 
 [requires]
 python_version = "3.7"
