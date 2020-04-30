@@ -5,7 +5,7 @@
 </template>
 
 <script>
-	import axios from 'axios'
+	import axios from 'axios' //导入第三方'name'
 	export default {
 		name: 'Ping',
 		data(){
@@ -18,7 +18,7 @@
 				const path = 'http://localhost:5000/api/ping'
 				axios.get(path)
 					.then((res)=>{
-						this.msg = res.data;
+						this.msg = res.data.name; //这个res其实就是get到的response, res可以定义任何名称
 					})
 					.catch((error)=>{
 						//eslint-disable-next-line

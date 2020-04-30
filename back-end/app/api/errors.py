@@ -15,15 +15,15 @@ def error_response(status_code, message=None):
 
 def bad_request(message):
     '''usually use 400:bad request'''
-    return error_respones(400, message)
+    return error_response(400, message)
 
 
 @bp.app_errorhandler(404)
 def not_found_error(error):
-    return error_respones(404)
+    return error_response(404)
 
 
 @bp.app_errorhandler(500)
 def internal_error(error):
     db.session.rollback()
-    return error_respones(500)
+    return error_response(500)
