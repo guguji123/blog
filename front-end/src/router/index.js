@@ -5,7 +5,8 @@ import Home from '@/components/Home'
 import Login from '@/components/Login'
 import Register from '@/components/Register'
 import Profile from '@/components/Profile'
-
+import EditProfile from '@/components/EditProfile'
+import store from '../store'
 Vue.use(Router)
 
 const router = new Router({
@@ -29,12 +30,20 @@ const router = new Router({
     	component:Register
     },
     {
-    	path:'/profile',
+    	path:'/user/:id', //动态路径参数,以冒号开头
     	name:'Profile',
     	component:Profile,
     	meta:{
     		requiresAuth:true
     	}
+    },
+    {
+        path:'/edit-profile',
+        name:'EditProfile',
+        component: EditProfile,
+        meta:{
+            requiresAuth:true
+        }
     },
     {
       path: '/ping',
@@ -56,8 +65,12 @@ router.beforeEach((to,from,next)=>{
 		next({
 			path:from.fullPath
 		})
+	}else if(token&&to.name == 'Register'){
+		next({
+            path:from.fullPath
+        })
 	}else{
-		next()
-	}
+        next()
+    }
 })
 export default router

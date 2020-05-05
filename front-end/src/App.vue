@@ -10,7 +10,7 @@ import Navbar from './components/Navbar' //导入组件用'./name'
 export default {
   name: 'App', // this is the name of the component
   components: {
-    navbar : Navbar
+    navbar : Navbar //新定义了组件名为小写的navbar,并在html的标签中引用
   }
 }
 </script>

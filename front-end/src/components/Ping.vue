@@ -10,7 +10,7 @@
 		name: 'Ping',
 		data(){
 			return {
-				msg:''
+				msg:'123'
 			}
 		},
 		methods:{

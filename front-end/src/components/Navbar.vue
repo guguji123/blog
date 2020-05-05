@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-light" style="margin-bottom: 20px;">
     <div class="container">
       <router-link to="/" class="navbar-brand">
-        <img src="../assets/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
+        <img src="../assets/leaf.png" width="30" height="30" class="d-inline-block align-top" alt="">
           Blog
       </router-link>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,15 +30,15 @@
             <a class="nav-link disabled" href="#">Messages</a>
           </li>
           <li class="nav-item">
-            <router-link to="/profile" class="nav-link">Profile</router-link>
+            <router-link v-bind:to="{ name: 'Profile', params: { id: sharedState.user_id }}" class="nav-link">Profile</router-link>
           </li>
           <li class="nav-item">
-            <a @click="handlerLogout" class="nav-link" href="#">Logout</a>
+            <a @click="handlerLogout" class="nav-link" href="#">Logout <i class="icon-logout"></i></a>
           </li>
           </ul>
           <ul v-else class="nav navbar-nav navbar-right">
           <li class="nav-item">
-            <router-link to="/login" class="nav-link">Login</router-link>
+            <router-link to="/login" class="nav-link">Login <i class="icon-login"></i></router-link>
           </li>
         </ul>
       </div>
@@ -52,12 +52,13 @@ export default {
   name: 'Navbar',  //this is the name of the component
   data(){
     return{
-      sharedState:store.state
+      sharedState: store.state
     }
   },
-  methods:{
-    handlerLogout(e){
+  methods: {
+    handlerLogout (e) {
       store.logoutAction()
+      this.$toasted.show('You have been logged out.', { icon: 'fingerprint' })
       this.$router.push('/login')
     }
   }

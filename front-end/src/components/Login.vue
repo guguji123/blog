@@ -26,26 +26,23 @@
     <br>
     <p>New User?<router-link to="/register">Click to Register</router-link></p>
     <p>
-        Forget Your Password?
+        Forgot Your Password?
         <a href="#">Click to Reset It</a>
     </p>
 </div>
 </template>
 <script>
-import axios from 'axios'
-import Alert from './Alert.vue'
-import store from '../store.js'
+//import axios from 'axios'
+//import Alert from './Alert.vue'
+import store from '../store'
 
 export default{
     name:'Login',//this is the name of the component
-    components:{
-        alert:Alert
-    },
     data(){
         return {
             sharedStated:store.state,
-            alertVariant:'info',
-            alertMessage:'Congratulations, you are now a registered user !',
+            //alertVariant:'info',
+            //alertMessage:'Congratulations, you are now a registered user !',
             loginForm:{
                 username:'',
                 password:'',
@@ -77,9 +74,9 @@ export default{
                 // 表单验证没通过时，不继续往下执行，即不会通过 axios 调用后端API
                 return false
             }
-            const path = 'http://localhost:5000/api/tokens'
+            const path = '/tokens'
             //axios 实现Basic Auth需要在config中设置 auth 这个属性即可  验证basic authentic
-            axios.post(path,{},{
+            this.$axios.post(path,{},{
                 auth:{
                     'username': this.loginForm.username,
                     'password': this.loginForm.password
@@ -87,8 +84,10 @@ export default{
             }).then((response)=>{
                 //handle success
                 window.localStorage.setItem('blog-token',response.data.token)
-                store.resetNotNewAction()
+                //store.resetNotNewAction()
                 store.loginAction()
+                const name = JSON.parse(atob(response.data.token.split('.')[1])).name
+                this.$toasted.success(`Welcome ${name}!`, { icon: 'fingerprint' })
                 if(typeof this.$route.query.redirect=='undefined'){
                     this.$router.push('/')
                 }else{
