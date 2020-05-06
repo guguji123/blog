@@ -57,7 +57,7 @@ def get_users():
 @token_auth.login_required
 def get_user(id):
     '''return an user'''
-    return jsonify(User.query.get_or_404(id).to_dict())
+    return jsonify(User.query.get_or_404(id).to_dict(include_email=True))
 
 
 @bp.route('users/<int:id>', methods=['PUT'])

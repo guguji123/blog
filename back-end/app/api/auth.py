@@ -2,6 +2,8 @@ from flask import g
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from app.models import User
 from app.api.errors import error_response
+from app import db
+
 
 basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth()
@@ -26,7 +28,10 @@ def basic_auth_error():
 @token_auth.verify_token
 def verify_token(token):
     '''检查用户请求是否有token，并且是否在有效期'''
-    g.current_user = User.check_token(token) if token else None
+    g.current_user = User.verify_jwt(token) if token else None
+    if g.current_user:
+        g.current_user.ping()
+        db.session.commit()
     return g.current_user is not None
 
 
