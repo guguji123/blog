@@ -94,7 +94,7 @@ export default {
   },
   methods: {
     getUser (id) {
-      const path = `/users/${id}`
+      const path = `api/users/${id}`
       this.$axios.get(path)
         .then((response) => {
           this.user = response.data

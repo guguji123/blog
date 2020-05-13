@@ -1,13 +1,13 @@
-from app import db
+from app.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import url_for, current_app
-import base64
+# import base64
 from datetime import datetime, timedelta
 import jwt
 import hashlib
 
-class PaginatedAPIMixin(object):
 
+class PaginatedAPIMixin(object):
     @staticmethod
     def to_collection_dict(query, page, per_page, endpoint, **kwargs):
         resources = query.paginate(page, per_page, False)
@@ -30,6 +30,8 @@ class PaginatedAPIMixin(object):
 
 
 class User(PaginatedAPIMixin, db.Model):
+    # 设置数据库表名，Post模型中的外键 author_id 会引用 users.id
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
@@ -41,9 +43,11 @@ class User(PaginatedAPIMixin, db.Model):
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     # token = db.Column(db.String(32), index=True, unique=True)
     # token_expiration = db.Column(db.DateTime)
+    posts = db.relationship('Post', backref='author',
+                            lazy='dynamic', cascade='all, delete-orphan')
 
     def __repr__(self):
-        return '<User {}>'.format(self.user)
+        return '<User {}>'.format(self.username)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -121,13 +125,63 @@ class User(PaginatedAPIMixin, db.Model):
         except jwt.exceptions.ExpiredSignatureError as e:
             return None
         return User.query.get(payload.get('user_id'))
-
+    """ 
     def revoke_token(self):
         self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
-
+     
     @staticmethod
     def check_token(token):
         user = User.query.filter_by(token=token).first()
         if user is None or user.token_expiration < datetime.utcnow():
             return None
-        return user
+        return user 
+    """
+
+
+class Post(PaginatedAPIMixin, db.Model):
+    __tablename__ = 'posts'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255))
+    summary = db.Column(db.Text)
+    body = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    views = db.Column(db.Integer, default=0)
+    # 外键，评论作者的 id
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    @staticmethod
+    def on_changed_body(target,value,oldvalue,initiator):
+        """ 
+        target: 有监听事件发生的 Post 实例对象
+        value: 监听哪个字段的变化
+        """
+        if not target.summary: #如果前段不填写摘要， 是空str，而不是None
+            target.summary = value[:200] #截取body 字段的前200个字符给summary
+
+
+    def to_dict(self):
+        data = {
+            'id':self.id,
+            'title':self.title,
+            'summary':self.summary,
+            'body':self.body,
+            'timestamp':self.timestamp,
+            'views':self.views,
+            'author':self.author.to_dict(),
+            '_links':{
+                'self': url_for('api.get_post',id=self.id),
+                'author_url':url_for('api.get_user',id = self.author_id)
+            }
+        }
+        return data
+
+
+    def from_dict(self, data):
+        for field in ['title', 'summary', 'body', 'timestamp', 'views']:
+            if field in data:
+                setattr(self, field, data[field])
+
+    def __repr__(self):
+        return '<Post {}>'.format(self.title)
+
+db.event.listen(Post.body,'set',Post.on_changed_body) # body 字段有变化时，执行 on_changed_body() 方法

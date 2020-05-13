@@ -41,7 +41,8 @@ export default {
   },
   methods: {
     getUser (id) {
-      const path = `/users/${id}`
+      console.log('hhhhhhhhhhhhhh')
+      const path = `/api/users/${id}`
       this.$axios.get(path)
         .then((response) => {
           this.profileForm.name = response.data.name
@@ -55,7 +56,7 @@ export default {
     },
     onSubmit (e) {
       const user_id = this.sharedState.user_id
-      const path = `/users/${user_id}`
+      const path = `/api/users/${user_id}`
       const payload = {
         name: this.profileForm.name,
         location: this.profileForm.location,

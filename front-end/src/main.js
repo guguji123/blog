@@ -8,15 +8,23 @@ import axios from './http'
 // 导入 moment.js 用来格式化 UTC 时间为本地时间
 import moment from 'moment'
 // Import Bootstrap css and js files
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap/dist/js/bootstrap.js'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap'
+// bootstrap-markdown 编辑器需要的样式
+import './assets/bootstrap-markdown/css/bootstrap-markdown.min.css'
+import './assets/bootstrap-markdown/css/custom.css'
+import './assets/icon-awesome/css/font-awesome.min.css'  // 编辑器上的按钮图标是使用 font-awesome 字体图标
+//字体图标
 import './assets/icon-line/css/simple-line-icons.css' // icon in text
 import './assets/icon-material/material-icons.css' //alert icon
-import './assets/icon-awesome/css/font-awesome.min.css' // 编辑器上的按钮图标是使用 font-awesome 字体图标
+
 // 自定义 css 文件
 import './assets/core.css' //profil font
 import './assets/custom.css' // profil border and button style
 import VueToasted  from 'vue-toasted'
+import VueSweetalert2 from 'vue-sweetalert2'
+import 'sweetalert2/dist/sweetalert2.min.css'
+Vue.use(VueSweetalert2) 
 
 Vue.use(VueToasted, {
   // 主题样式 primary/outline/bubble
@@ -36,6 +44,17 @@ Vue.use(VueToasted, {
   },
 
 });
+// 使用 highlight.js 高亮代码。 vue-router 从 Home 页路由到 Post 页后，会重新渲染并且会移除事件
+// 注册自定义指令，后续在组件中使用 v-highlight
+import hljs from 'highlight.js'
+// 样式文件，浅色：default, atelier-dune-light  深色：atom-one-dark, atom-one-dark-reasonable, monokai
+import 'highlight.js/styles/monokai.css'
+Vue.directive('highlight',function (el) {
+  let blocks = el.querySelectorAll('pre code');
+  blocks.forEach((block)=>{
+    hljs.highlightBlock(block)
+  })
+})
 
 Vue.config.productionTip = false
 

@@ -1,9 +1,9 @@
 from app.api import bp
 from flask import request, jsonify, url_for
-from app.api.errors import bad_request
+from app.api.errors import bad_request, error_response
 import re
 from app.models import User
-from app import db
+from app.extensions import db
 from app.api.auth import token_auth
 
 
@@ -93,6 +93,14 @@ def update_user(id):
 
 
 @bp.route('user/<id>', methods=['DELETE'])
+@token_auth.login_required
 def delete_user(id):
     '''delete an user'''
-    pass
+    user = user.query.get_or_404(id)
+    """ 403 Forbidden 服务器理解请求客户端的请求，但是拒绝执行此请求"""
+    if g.current_user != user:
+        return error_response(403)
+    db.session.delete(user)
+    db.session.commit()
+    """ 204 No Content 无内容。服务器成功处理，但未返回内容。 """
+    return '', 204 
